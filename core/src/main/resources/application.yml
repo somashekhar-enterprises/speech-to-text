@@ -1,7 +1,5 @@
 gcs:
   bucket-name: test-speech-to-text-gcs
-ffmpeg:
-  executable.location: D:\ffmpeg\ffmpeg-2023-07-19-git-efa6cec759-essentials_build\ffmpeg-2023-07-19-git-efa6cec759-essentials_build\ffmpeg-2023-07-19-git-efa6cec759-essentials_build\bin
 spring:
   cloud:
     gcp:

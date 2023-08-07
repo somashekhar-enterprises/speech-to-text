@@ -1,96 +1,92 @@
+// Global variables
 let mediaRecorder;
 let recordedChunks = [];
 let isRecording = false;
 
-const startButton = document.getElementById('startButton');
-const stopButton = document.getElementById('stopButton');
+// Elements
+const startButton = document.getElementById('startRecording');
+const stopButton = document.getElementById('stopRecording');
 const responseDiv = document.getElementById('response');
 
+// Event listeners
 startButton.addEventListener('click', startRecording);
 stopButton.addEventListener('click', stopRecording);
 
+// Function to start recording
 function startRecording() {
+    isRecording = true;
+    startButton.disabled = true;
+    stopButton.disabled = false;
+
+    recordedChunks = [];
     navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(function(stream) {
+        .then(stream => {
             mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.ondataavailable = handleDataAvailable;
+
+            mediaRecorder.ondataavailable = event => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                isRecording = false;
+                startButton.disabled = false;
+                stopButton.disabled = true;
+
+                // When recording stops, send the audio to the server
+                sendToServer();
+            };
+
             mediaRecorder.start();
-            recordedChunks = [];
-            isRecording = true;
-            startButton.disabled = true;
-            stopButton.disabled = false;
-            responseDiv.textContent = 'Recording...';
         })
-        .catch(function(error) {
+        .catch(error => {
             console.error('Error accessing the microphone:', error);
         });
 }
 
+// Function to stop recording
 function stopRecording() {
-    if (isRecording) {
+    if (mediaRecorder && isRecording) {
         mediaRecorder.stop();
-        isRecording = false;
-        startButton.disabled = false;
-        stopButton.disabled = true;
-        responseDiv.textContent = 'Processing...';
     }
 }
 
-function handleDataAvailable(event) {
-    if (event.data.size > 0) {
-        recordedChunks.push(event.data);
-    }
-}
-
-function sendAudioToServer(audioBlob) {
+// Function to send the recorded voice to the server and stream the response
+async function sendToServer() {
+    const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
     const formData = new FormData();
     formData.append('audio', audioBlob);
 
-    fetch('http://127.0.0.1:8080/api/v1/speechtotext/transcribe', {
-        method: 'POST',
-        body: formData
-    })
-    .then(function(response) {
-        if (response.ok) {
-            // Handle the streaming response from the server
-            receiveStreamingResponse(response);
-        } else {
-            console.error('Failed to send audio:', response.statusText);
-            responseDiv.textContent = 'Error sending audio';
-        }
-    })
-    .catch(function(error) {
-        console.error('Error sending the audio:', error);
-        responseDiv.textContent = 'Error sending audio';
-    });
-}
+    try {
+        const response = await fetch('http://127.0.0.1:8080/api/v1/speechtotext/transcribe', {
+            method: 'POST',
+            body: formData
+        });
 
-function receiveStreamingResponse(response) {
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+        // Get the response body as a ReadableStream
+        const reader = response.body.getReader();
 
-    function read() {
-        return reader.read().then(({ done, value }) => {
+        // Function to continuously read and display streamed data
+        const readStream = async () => {
+            const { done, value } = await reader.read();
+
             if (done) {
-                console.log('Streaming response complete!');
+                // Streamed response complete
                 return;
             }
 
-            // Process the received data and display it on the screen
-            const message = decoder.decode(value);
-            displayMessage(message);
+            // Decode the streamed data and display on the screen
+            const text = new TextDecoder().decode(value);
+            responseDiv.textContent += text;
 
-            return read(); // Continue reading
-        });
+            // Continue reading the stream
+            readStream();
+        };
+
+        // Start reading the stream
+        readStream();
+    } catch (error) {
+        console.error('Error sending audio to server:', error);
     }
-
-    read().catch(error => {
-        console.error('Error reading streaming response:', error);
-        responseDiv.textContent = 'Error receiving response';
-    });
-}
-
-function displayMessage(message) {
-    // Display the received message on the screen (you can customize this part)
-    responseDiv.textContent = message;
 }
