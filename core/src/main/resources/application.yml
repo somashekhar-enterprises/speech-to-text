@@ -1,7 +1,0 @@
-gcs:
-  bucket-name: test-speech-to-text-gcs
-spring:
-  cloud:
-    gcp:
-      credentials:
-        location: file:D:\GcloudAPIKeys\speech-to-text-key.json
