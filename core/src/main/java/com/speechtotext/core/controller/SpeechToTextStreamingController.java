@@ -25,7 +25,7 @@ public class SpeechToTextStreamingController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpeechToTextStreamingController.class);
 
-    private static final String AUDIO_PATH = "static/audio";
+    private static final String AUDIO_PATH = "D:\\speech-to-text\\core\\src\\main\\resources\\static\\audio";
 
     @Inject
     private SpeechToTextRecognizer speechToTextRecognizer;
@@ -48,9 +48,9 @@ public class SpeechToTextStreamingController {
 
     private byte[] convertToWav(MultipartFile audioFile) throws IOException {
         String uuid = UUID.randomUUID().toString();
-        File webmFile = Files.write(Paths.get(format("%s/input-%s.webm", AUDIO_PATH, uuid)),
+        File webmFile = Files.write(Paths.get(format("%s\\input-%s.webm", AUDIO_PATH, uuid)),
                 audioFile.getBytes()).toFile();
-        String resultLocation = format("%s/final-%s.wav", AUDIO_PATH, uuid);
+        String resultLocation = format("%s\\final-%s.wav", AUDIO_PATH, uuid);
 
         String command = format("ffmpeg -i %s %s", webmFile.getAbsolutePath(), resultLocation);
 
@@ -75,14 +75,5 @@ public class SpeechToTextStreamingController {
     private void cleanupIntermediaryFiles(Path webmFilePath, Path resultingWavPath) throws IOException {
         Files.deleteIfExists(webmFilePath);
         Files.deleteIfExists(resultingWavPath);
-    }
-
-    private Long sizeFromFile(Path path) {
-        try {
-            return Files.size(path);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return 0L;
     }
 }

@@ -20,9 +20,7 @@ public class SpeechToTextRecognizer {
             // Transcribes your audio file using the specified configuration.
             RecognitionConfig config = RecognitionConfig.newBuilder()
                     .setEncoding(RecognitionConfig.AudioEncoding.LINEAR16)
-                    .setSampleRateHertz(48000)
                     .setLanguageCode("en-US")
-                    .setAudioChannelCount(1)
                     .setEnableWordTimeOffsets(true)
                     .setEnableAutomaticPunctuation(true)
                     .setEnableWordConfidence(true)

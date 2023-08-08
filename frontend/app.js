@@ -59,7 +59,7 @@ async function sendToServer() {
     formData.append('audio', audioBlob);
 
     try {
-        const response = await fetch('http://127.0.0.1:8080/api/v1/speechtotext/transcribe', {
+        const response = await fetch('http://127.0.0.1:8080/api/v1/speechtotext/stream/transcribe', {
             method: 'POST',
             body: formData
         });
