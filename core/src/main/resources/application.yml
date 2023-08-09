@@ -1,0 +1,5 @@
+nlp:
+  flask.api.url: http://127.0.0.1:5000/api/categorize
+
+audio:
+  storage.path: D:\speech-to-text\core\src\main\resources\static\audio\

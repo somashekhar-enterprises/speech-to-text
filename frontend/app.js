@@ -1,92 +1,108 @@
-// Global variables
-let mediaRecorder;
-let recordedChunks = [];
-let isRecording = false;
+document.addEventListener("DOMContentLoaded", function() {
+    const recordButton = document.getElementById("recordButton");
+    const stopButton = document.getElementById("stopButton");
+    const pauseButton = document.getElementById("pauseButton");
 
-// Elements
-const startButton = document.getElementById('startRecording');
-const stopButton = document.getElementById('stopRecording');
-const responseDiv = document.getElementById('response');
 
-// Event listeners
-startButton.addEventListener('click', startRecording);
-stopButton.addEventListener('click', stopRecording);
+    let mediaRecorder;
+    let audioChunks = [];
 
-// Function to start recording
-function startRecording() {
-    isRecording = true;
-    startButton.disabled = true;
-    stopButton.disabled = false;
+    recordButton.addEventListener("click", startRecording);
+    pauseButton.addEventListener("click", pauseRecording);
+    stopButton.addEventListener("click", stopRecording);
 
-    recordedChunks = [];
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            mediaRecorder = new MediaRecorder(stream);
 
-            mediaRecorder.ondataavailable = event => {
-                if (event.data.size > 0) {
-                    recordedChunks.push(event.data);
-                }
-            };
+    function startRecording() {
+        recordButton.disabled = true;
+        pauseButton.disabled = false;
+        stopButton.disabled = false;
 
-            mediaRecorder.onstop = () => {
-                isRecording = false;
-                startButton.disabled = false;
-                stopButton.disabled = true;
+        audioChunks = [];
 
-                // When recording stops, send the audio to the server
-                sendToServer();
-            };
-
-            mediaRecorder.start();
-        })
-        .catch(error => {
-            console.error('Error accessing the microphone:', error);
-        });
-}
-
-// Function to stop recording
-function stopRecording() {
-    if (mediaRecorder && isRecording) {
-        mediaRecorder.stop();
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function(stream) {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                mediaRecorder.start();
+            })
+            .catch(function(error) {
+                console.error("Error accessing microphone:", error);
+            });
     }
-}
 
-// Function to send the recorded voice to the server and stream the response
-async function sendToServer() {
-    const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-    const formData = new FormData();
-    formData.append('audio', audioBlob);
+    function stopRecording() {
+        recordButton.disabled = false;
+        pauseButton.disabled = true;
+        stopButton.disabled = true;
 
-    try {
-        const response = await fetch('http://127.0.0.1:8080/api/v1/speechtotext/stream/transcribe', {
-            method: 'POST',
-            body: formData
-        });
+        if (mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+        }
 
-        // Get the response body as a ReadableStream
-        const reader = response.body.getReader();
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+            const formData = new FormData();
+            formData.append("audio", audioBlob, "audio.webm");
 
-        // Function to continuously read and display streamed data
-        const readStream = async () => {
-            const { done, value } = await reader.read();
+            fetch("http://localhost:8080/api/v1/speechtotext/categorize", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const complaints = data.categories.complaints;
+                const diagnosis = data.categories.diagnoses;
+                const notes = data.categories.notes;
+                populateDiv("complaints", complaints);
+                populateDiv("diagnosis", diagnosis);
+                populateDiv("notes", notes);
+            })
+            .catch(error => {
+                console.error("Error uploading audio:", error);
+            });
+        };
+    }
 
-            if (done) {
-                // Streamed response complete
-                return;
-            }
+    function pauseRecording() {
+        recordButton.disabled = false;
+        pauseButton.disabled = true;
+        stopButton.disabled = false;
 
-            // Decode the streamed data and display on the screen
-            const text = new TextDecoder().decode(value);
-            responseDiv.textContent += text;
+        if (mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+        }
+        
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+            const formData = new FormData();
+            formData.append("audio", audioBlob, "audio.webm");
 
-            // Continue reading the stream
-            readStream();
+            fetch("http://localhost:8080/api/v1/speechtotext/categorize", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const complaints = data.categories.complaints;
+                const diagnosis = data.categories.diagnoses;
+                const notes = data.categories.notes;
+                populateDiv("complaints", complaints);
+                populateDiv("diagnosis", diagnosis);
+                populateDiv("notes", notes);
+            })
+            .catch(error => {
+                console.error("Error uploading audio:", error);
+            });
         };
 
-        // Start reading the stream
-        readStream();
-    } catch (error) {
-        console.error('Error sending audio to server:', error);
     }
-}
+
+    function populateDiv(divId, data) {
+        const div = document.getElementById(divId);
+        div.value += data.map(item => `${item}`).join(" ");
+    }
+});
