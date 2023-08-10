@@ -16,7 +16,7 @@ public class SpeechToTextRecognizer {
 
     public String convert(byte[] audioContent) {
         try (SpeechClient speechClient = SpeechClient.create()) {
-
+            LOGGER.info("Created speechClient: {} for audio content: {}", speechClient, audioContent);
             // Transcribes your audio file using the specified configuration.
             RecognitionConfig config = RecognitionConfig.newBuilder()
                     .setEncoding(RecognitionConfig.AudioEncoding.LINEAR16)
@@ -32,8 +32,12 @@ public class SpeechToTextRecognizer {
             RecognizeResponse response = speechClient.recognize(config, audio);
             List<SpeechRecognitionResult> results = response.getResultsList();
 
-            return results.get(0).getAlternatives(0).getTranscript();
+            StringBuilder transcription = new StringBuilder();
+            for (SpeechRecognitionResult result: results) {
+                transcription.append(result.getAlternatives(0).getTranscript());
+            }
 
+            return transcription.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
