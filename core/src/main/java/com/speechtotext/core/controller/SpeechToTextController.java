@@ -44,7 +44,7 @@ public class SpeechToTextController {
                 .body("API Server is up!");
     }
 
-    @PostMapping(value = "/transcribe", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+    @PostMapping(value = "/stream/transcribe", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
     produces = MediaType.TEXT_PLAIN_VALUE)
     @CrossOrigin(origins = "*")
     public Flux<String> getText(@RequestPart("audio") MultipartFile audioFile) throws IOException {
