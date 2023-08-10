@@ -4,6 +4,7 @@
 1. JDK 17 or greater
 2. Gradle 8 or greater
 3. GCP speech-to-text setup with service account keys
+4. ffmpeg tool installed
 
 ## Instructions
 1. Navigate to <code> /path/to/repo/root/core </code>
