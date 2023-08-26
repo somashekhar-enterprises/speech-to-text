@@ -3,3 +3,5 @@ nlp:
 
 audio:
   storage.path: D:\speech-to-text\core\src\main\resources\static\audio\
+
+springdoc.api-docs.path: /api-docs
