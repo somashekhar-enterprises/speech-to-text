@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
@@ -38,14 +37,8 @@ public class SpeechToTextController {
     @Inject
     private SpeechCategorizer speechCategorizer;
 
-    @GetMapping("test")
-    public ResponseEntity<String> testEndpoint() {
-        return ResponseEntity.ok()
-                .body("API Server is up!");
-    }
-
     @PostMapping(value = "/stream/transcribe", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-    produces = MediaType.TEXT_PLAIN_VALUE)
+            produces = MediaType.TEXT_PLAIN_VALUE)
     @CrossOrigin(origins = "*")
     public Flux<String> getText(@RequestPart("audio") MultipartFile audioFile) throws IOException {
         byte[] content = convertToWav(audioFile, UUID.randomUUID().toString());
