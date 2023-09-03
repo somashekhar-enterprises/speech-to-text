@@ -4,7 +4,7 @@ public class CategorizedSpeechRequest {
 
     private String transcription;
 
-    private String userId;
+    private String sessionId;
 
     public String getTranscription() {
         return transcription;
@@ -14,11 +14,11 @@ public class CategorizedSpeechRequest {
         this.transcription = transcription;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getSessionId() {
+        return sessionId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }
