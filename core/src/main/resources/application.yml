@@ -2,6 +2,18 @@ nlp:
   flask.api.url: http://127.0.0.1:5000/api/categorize
 
 audio:
-  storage.path: 'classpath:/static/audio'
+  storage.path: classpath:/static/audio
 
 springdoc.api-docs.path: /api-docs
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pm
+    username: postgres
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

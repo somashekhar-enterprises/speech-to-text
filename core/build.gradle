@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.2'
 	id 'io.spring.dependency-management' version '1.1.2'
+	id "org.flywaydb.flyway" version "9.19.0"
 }
 
 group = 'com.speechtotext'
@@ -18,6 +19,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jersey'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	implementation 'com.google.cloud:libraries-bom:25.1.0'
 	implementation 'com.google.cloud:google-cloud-speech:4.15.0'
@@ -33,6 +35,11 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+}
+
+flyway {
+	url = 'jdbc:postgresql://localhost:5432/pm'
+	user = 'postgres'
 }
 
 tasks.named('test') {
