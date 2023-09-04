@@ -5,9 +5,11 @@ public class PatientAttribute {
 
     private String complaints;
 
+    private String investigation;
+
     private String diagnosis;
 
-    private String notes;
+    private String clinicalNotes;
 
     private String treatment;
 
@@ -27,12 +29,12 @@ public class PatientAttribute {
         this.diagnosis = diagnosis;
     }
 
-    public String getNotes() {
-        return notes;
+    public String getClinicalNotes() {
+        return clinicalNotes;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setClinicalNotes(String clinicalNotes) {
+        this.clinicalNotes = clinicalNotes;
     }
 
     public String getTreatment() {
@@ -41,5 +43,13 @@ public class PatientAttribute {
 
     public void setTreatment(String treatment) {
         this.treatment = treatment;
+    }
+
+    public String getInvestigation() {
+        return investigation;
+    }
+
+    public void setInvestigation(String investigation) {
+        this.investigation = investigation;
     }
 }
