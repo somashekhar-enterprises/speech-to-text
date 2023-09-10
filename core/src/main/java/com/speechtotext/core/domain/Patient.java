@@ -2,6 +2,7 @@ package com.speechtotext.core.domain;
 
 import com.speechtotext.core.domain.attribute.PatientAttribute;
 import com.speechtotext.core.domain.attribute.converter.PatientAttributeConverter;
+import com.speechtotext.core.domain.model.TenantAwareModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "patients")
-public class Patient {
+public class Patient implements TenantAwareModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -80,6 +81,7 @@ public class Patient {
         this.attributes = attributes;
     }
 
+    @Override
     public Tenant getTenant() {
         return tenant;
     }
