@@ -1,0 +1,2 @@
+ALTER TABLE tenants ADD password VARCHAR(255);
+ALTER TABLE tenants ADD salt VARCHAR(255);
