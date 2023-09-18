@@ -12,11 +12,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/transcribe").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/speechtotext").setAllowedOrigins("*").withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/transcript");
+        registry.enableSimpleBroker("/topic");
     }
 }
