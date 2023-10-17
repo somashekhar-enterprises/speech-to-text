@@ -1,5 +1,6 @@
 package com.speechtotext.core.controller.websocket;
 
+import com.speechtotext.core.dto.request.AudioRequest;
 import com.speechtotext.core.dto.response.TranscriptResponse;
 import com.speechtotext.core.service.SpeechToTextRecognizer;
 import jakarta.inject.Inject;
@@ -17,8 +18,8 @@ public class TranscriptionController {
 
     @MessageMapping("/transcribe")
     @SendTo("/topic/stream")
-    public TranscriptResponse transcribe(byte[] audioData) throws IOException {
-        String transcript = speechToTextRecognizer.convert(audioData);
+    public TranscriptResponse transcribe(AudioRequest request) throws IOException {
+        String transcript = speechToTextRecognizer.convert(request.getContent());
 
         TranscriptResponse response = new TranscriptResponse();
         response.setTranscript(transcript);

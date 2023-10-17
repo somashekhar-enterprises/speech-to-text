@@ -23,10 +23,11 @@ public class SpeechToTextRecognizer {
             // Transcribes your audio file using the specified configuration.
             RecognitionConfig config = RecognitionConfig.newBuilder()
                     .setEncoding(RecognitionConfig.AudioEncoding.LINEAR16)
-                    .setLanguageCode("en-IN")
+                    .setLanguageCode("en-US")
                     .setEnableWordTimeOffsets(true)
                     .setEnableAutomaticPunctuation(true)
                     .setEnableWordConfidence(true)
+                    .setModel("latest_long")
                     .build();
 
             RecognitionAudio audio = RecognitionAudio.newBuilder().setContent(ByteString.copyFrom(audioContent)).build();
