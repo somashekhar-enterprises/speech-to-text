@@ -10,17 +10,16 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "tenants")
-public class Tenant {
+public class Tenant implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,11 +28,14 @@ public class Tenant {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
+
     @Column(name = "password")
     private String password;
-    
-    @Column(name = "salt")
-    private String salt;
 
     @Column(name = "phone_number", nullable = false)
     private String phone;
@@ -61,30 +63,25 @@ public class Tenant {
         this.name = name;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
-        this.salt = getSalt();
-        this.password = hashPassword(password, salt);
-    }
-
-    public boolean passwordValid(String inputPasswd) {
-        String hashedInput = hashPassword(inputPasswd, this.salt);
-        return this.password.equals(hashedInput);
-    }
-
-    private String hashPassword(String password, String salt) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.encode(salt + password);
-    }
-
-    private String getSalt() {
-        SecureRandom random = new SecureRandom();
-        byte[] saltBytes = new byte[16];
-        random.nextBytes(saltBytes);
-        return Base64.getEncoder().encodeToString(saltBytes);
+        this.password = password;
     }
 
     public String getPhone() {
@@ -109,5 +106,35 @@ public class Tenant {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

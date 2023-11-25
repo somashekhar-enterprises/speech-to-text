@@ -33,7 +33,7 @@ public class SpeechToTextController {
     @PostMapping(value = "categorize", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin(origins = "*")
-    public ResponseEntity<CategorizedSpeechResponse> categorize(@RequestHeader("x-session-id") String sessionId,
+    ResponseEntity<CategorizedSpeechResponse> categorize(@RequestHeader("x-session-id") String sessionId,
                                                                 @RequestPart("audio") MultipartFile audioFile) throws IOException {
         byte[] content = byteConverter.convertToWav(audioFile, sessionId);
         String transcript = speechToTextRecognizer.convert(content);

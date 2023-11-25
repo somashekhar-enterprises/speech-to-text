@@ -1,9 +1,8 @@
-package com.speechtotext.core.domain.attribute;
-
+package com.speechtotext.core.dto.response;
 
 import java.util.List;
 
-public class PatientAttribute {
+public class PatientAttributeResponse {
 
     private List<String> complaints;
 

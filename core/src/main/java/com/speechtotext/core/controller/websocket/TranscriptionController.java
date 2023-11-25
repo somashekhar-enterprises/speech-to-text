@@ -18,7 +18,7 @@ public class TranscriptionController {
 
     @MessageMapping("/transcribe")
     @SendTo("/topic/stream")
-    public TranscriptResponse transcribe(AudioRequest request) throws IOException {
+    TranscriptResponse transcribe(AudioRequest request) throws IOException {
         String transcript = speechToTextRecognizer.convert(request.getContent());
 
         TranscriptResponse response = new TranscriptResponse();

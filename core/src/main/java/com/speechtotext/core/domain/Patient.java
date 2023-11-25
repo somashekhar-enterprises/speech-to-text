@@ -105,4 +105,5 @@ public class Patient implements TenantAwareModel {
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
+
 }
