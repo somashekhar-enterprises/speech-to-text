@@ -1,12 +1,13 @@
 package com.speechtotext.core.service;
 
-import com.speechtotext.core.context.TenantContext;
 import com.speechtotext.core.dao.TenantRepository;
 import com.speechtotext.core.domain.Tenant;
 import com.speechtotext.core.dto.request.TenantRequest;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,7 +35,14 @@ public class TenantService implements UserDetailsService {
         return tenantRepository.findById(UUID.fromString(tenantId)).orElseThrow(RuntimeException::new);
     }
 
+    private void checkIfTenantExists(String username) {
+        if (null != findByUsername(username)) {
+            throw new BadRequestException(format("Tenant with username %s already exists", username));
+        }
+    }
+
     public Tenant register(TenantRequest request) {
+        checkIfTenantExists(request.getUsername());
         Tenant toSave = new Tenant();
         toSave.setName(request.getName());
         toSave.setEmail(request.getEmail());
@@ -46,7 +54,6 @@ public class TenantService implements UserDetailsService {
         return tenantRepository.save(toSave);
     }
 
-//    @Cacheable(value = "tenant", key = "#username")
     public Tenant findByUsername(String username) {
         return tenantRepository.findByUsername(username)
                 .orElse(null);
@@ -58,6 +65,6 @@ public class TenantService implements UserDetailsService {
         if (null == tenant) {
             throw new UsernameNotFoundException(format("Tenant with username %s not found", username));
         }
-        return tenant;
+        return new User(tenant.getUsername(), tenant.getPassword(), new HashSet<>());
     }
 }

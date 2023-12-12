@@ -6,6 +6,14 @@ public class LoginResponse {
 
     private String message;
 
+    private boolean isSuccess;
+
+    public LoginResponse(String username, String loginFailed, boolean b) {
+        this.username = username;
+        this.message = loginFailed;
+        this.isSuccess = b;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -20,5 +28,13 @@ public class LoginResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+
+    public void setSuccess(boolean success) {
+        isSuccess = success;
     }
 }

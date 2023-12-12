@@ -16,20 +16,18 @@ import jakarta.ws.rs.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/tenant")
@@ -52,20 +50,22 @@ public class TenantController {
     @Inject
     private TenantToTenantResponseConverter tenantToTenantResponseConverter;
 
-    @PostMapping("/register")
-    TenantResponse register(@Valid @RequestBody TenantRequest request) {
+    @PostMapping("noauth/register")
+    @CrossOrigin(origins = "*")
+    ResponseEntity<TenantResponse> register(@Valid @RequestBody TenantRequest request) {
         LOGGER.info("Registering tenant with email {}", request.getEmail());
         Tenant tenant = tenantService.register(request);
-        return tenantToTenantResponseConverter.convert(tenant);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(
+                tenantToTenantResponseConverter.convert(tenant));
     }
 
-    @PostMapping("/login")
-    LoginResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest servletRequest,
-                        HttpServletResponse servletResponse) {
+    @PostMapping("noauth/login")
+    @CrossOrigin(origins = "*")
+    ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest servletRequest,
+                                       HttpServletResponse servletResponse) {
         LOGGER.info("Logging in tenant with username {}", request.getUsername());
 
         try {
-
             Authentication authentication =
                     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),
                             request.getPassword()));
@@ -76,19 +76,19 @@ public class TenantController {
             securityContextRepository.saveContext(context, servletRequest, servletResponse);
         } catch (Exception e) {
             LOGGER.error("Error while authenticating tenant with username {}", request.getUsername(), e);
-            throw new BadRequestException("Error while authenticating tenant");
+            return ResponseEntity.status(401).contentType(MediaType.APPLICATION_JSON).body(
+                    new LoginResponse(request.getUsername(), "Login failed", false));
         }
 
-        LoginResponse response = new LoginResponse();
-        response.setUsername(request.getUsername());
-        response.setMessage("Login successful");
-        return response;
+        LoginResponse response = new LoginResponse(request.getUsername(), "Login successful", true);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     @GetMapping("/me")
-    TenantResponse get() {
+    ResponseEntity<TenantResponse> get() {
         String tenant = TenantContext.getCurrentTenantId();
         LOGGER.info("Getting tenant with username {}", tenant);
-        return tenantToTenantResponseConverter.convert(tenantService.findById(tenant));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(tenantToTenantResponseConverter.convert(tenantService.findById(tenant)));
     }
 }

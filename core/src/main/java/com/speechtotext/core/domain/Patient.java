@@ -37,6 +37,9 @@ public class Patient implements TenantAwareModel {
     @Column(name = "attributes")
     private PatientAttribute attributes;
 
+    @Column(name = "summary", columnDefinition = "TEXT")
+    private String summary;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tenant_id", nullable = false)
     private Tenant tenant;
@@ -79,6 +82,14 @@ public class Patient implements TenantAwareModel {
 
     public void setAttributes(PatientAttribute attributes) {
         this.attributes = attributes;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     @Override

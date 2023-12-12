@@ -1,19 +1,17 @@
 package com.speechtotext.core.controller;
 
-import com.speechtotext.core.dto.request.CategorizedSpeechRequest;
-import com.speechtotext.core.dto.response.CategorizedSpeechResponse;
-import com.speechtotext.core.service.FileToByteConverter;
-import com.speechtotext.core.service.SpeechCategorizer;
+import com.speechtotext.core.converter.PatientToPatientResponseConverter;
+import com.speechtotext.core.dto.request.SummarizeTranscriptRequest;
+import com.speechtotext.core.service.OpenAISpeechSummarizer;
+import com.speechtotext.core.service.OpenAISpeechToTextRecognizer;
+import com.speechtotext.core.service.PatientService;
 import jakarta.inject.Inject;
-import com.speechtotext.core.service.SpeechToTextRecognizer;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("api/v1/speechtotext/")
@@ -22,29 +20,30 @@ public class SpeechToTextController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpeechToTextController.class);
 
     @Inject
-    private SpeechToTextRecognizer speechToTextRecognizer;
+    private OpenAISpeechToTextRecognizer openAISpeechToTextRecognizer;
 
     @Inject
-    private FileToByteConverter byteConverter;
+    private OpenAISpeechSummarizer speechSummarizer;
 
     @Inject
-    private SpeechCategorizer speechCategorizer;
+    private PatientToPatientResponseConverter converter;
 
-    @PostMapping(value = "categorize", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Inject
+    private PatientService patientService;
+
+    @PostMapping(value = "transcribe", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.TEXT_PLAIN_VALUE)
     @CrossOrigin(origins = "*")
-    ResponseEntity<CategorizedSpeechResponse> categorize(@RequestHeader("x-session-id") String sessionId,
-                                                                @RequestPart("audio") MultipartFile audioFile) throws IOException {
-        byte[] content = byteConverter.convertToWav(audioFile, sessionId);
-        String transcript = speechToTextRecognizer.convert(content);
-        LOGGER.info("Transcribed audio to: {}", transcript);
+    String transcribe(@RequestPart("audio") MultipartFile audioFile) throws Exception {
+        byte[] content = audioFile.getBytes();
+        return openAISpeechToTextRecognizer.recognize(content);
+    }
 
-        CategorizedSpeechRequest request = new CategorizedSpeechRequest();
-        request.setTranscription(transcript);
-        request.setSessionId(sessionId);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(speechCategorizer.getCategoriesFromApi(request));
+    @PostMapping(value = "summarize", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.TEXT_PLAIN_VALUE)
+    @CrossOrigin(origins = "*")
+    String summarize(@Valid @RequestBody SummarizeTranscriptRequest request) {
+        return speechSummarizer.summarize(request.getTranscript());
     }
 
 }

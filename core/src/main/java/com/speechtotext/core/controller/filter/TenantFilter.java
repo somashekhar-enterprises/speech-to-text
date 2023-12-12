@@ -17,6 +17,8 @@ public class TenantFilter extends OncePerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TenantFilter.class);
 
+    private static final String TENANT_HEADER = "X-Tenant";
+
     private final TenantService tenantService;
 
     public TenantFilter(TenantService tenantService) {
@@ -53,8 +55,9 @@ public class TenantFilter extends OncePerRequestFilter {
     }
 
     private boolean permittedURIs(String requestURI) {
-        return requestURI.startsWith("/api/v1/tenant/register") || requestURI.startsWith("/api-docs")
-                || requestURI.startsWith("/api/v1/tenant/login");
+        return requestURI.matches(".*/noauth/.*")
+                || requestURI.matches("/api-docs.*")
+                || requestURI.matches(".*/speechtotext.*");
     }
 
     @Override
@@ -63,11 +66,10 @@ public class TenantFilter extends OncePerRequestFilter {
                 || request.getRequestURI().startsWith("/css/")
                 || request.getRequestURI().startsWith("/js/")
                 || request.getRequestURI().startsWith("/.ico");
-
     }
 
     private String getTenant(HttpServletRequest request) {
-        String tenant = request.getHeader("X-Tenant");
+        String tenant = request.getHeader(TENANT_HEADER);
         if (null == tenant) {
             tenant = request.getParameter("tenant");
         }
