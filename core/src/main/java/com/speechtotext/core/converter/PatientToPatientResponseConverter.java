@@ -6,24 +6,37 @@ import com.speechtotext.core.dto.response.PatientResponse;
 import jakarta.inject.Inject;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.Set;
+
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toSet;
+
 @Component
 public class PatientToPatientResponseConverter {
-
-    @Inject
-    private TenantToTenantResponseConverter tenantResponseConverter;
 
     public PatientResponse convert(Patient source) {
         PatientResponse response = new PatientResponse();
         response.setFirstName(source.getFirstName());
         response.setLastName(source.getLastName());
-        PatientAttributeResponse attributeResponse = new PatientAttributeResponse();
-        attributeResponse.setComplaints(source.getAttributes().getComplaints());
-        attributeResponse.setInvestigation(source.getAttributes().getInvestigation());
-        attributeResponse.setDiagnosis(source.getAttributes().getDiagnosis());
-        attributeResponse.setClinicalNotes(source.getAttributes().getClinicalNotes());
-        attributeResponse.setTreatment(source.getAttributes().getTreatment());
-        response.setAttributes(attributeResponse);
-        response.setTenant(tenantResponseConverter.convert(source.getTenant()));
+        populateAttributesIfNonNull(source, response);
+        response.setTenant(source.getTenant().getUsername());
+        response.setPatientId(source.getId());
+        response.setSummary(source.getSummary());
         return response;
+    }
+
+    private static void populateAttributesIfNonNull(Patient source, PatientResponse response) {
+        PatientAttributeResponse attributeResponse = new PatientAttributeResponse();
+        if (nonNull(source.getAttributes())) {
+            attributeResponse.setComplaints(source.getAttributes().getComplaints());
+            attributeResponse.setDiagnosis(source.getAttributes().getDiagnosis());
+            attributeResponse.setClinicalNotes(source.getAttributes().getClinicalNotes());
+        }
+        response.setAttributes(attributeResponse);
+    }
+
+    public Set<PatientResponse> convert(Collection<Patient> source) {
+        return source.stream().map(this::convert).collect(toSet());
     }
 }

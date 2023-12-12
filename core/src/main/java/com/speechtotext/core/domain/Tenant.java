@@ -19,7 +19,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "tenants")
-public class Tenant implements UserDetails {
+public class Tenant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -75,7 +75,6 @@ public class Tenant implements UserDetails {
         this.username = username;
     }
 
-    @Override
     public String getPassword() {
         return password;
     }
@@ -108,33 +107,8 @@ public class Tenant implements UserDetails {
         this.created = created;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptySet();
-    }
-
-    @Override
     public String getUsername() {
         return username;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

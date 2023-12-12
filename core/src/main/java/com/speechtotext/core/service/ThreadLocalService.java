@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service;
 public class ThreadLocalService {
 
     public String getTenantID() {
-        return TenantContext.getCurrentTenant();
+        return TenantContext.getCurrentTenantId();
     }
 }

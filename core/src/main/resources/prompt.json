@@ -1,0 +1,20 @@
+{ "model": "gpt-3.5-turbo",
+  "messages": [
+    {
+      "role": "system",
+      "content": "I want you to give me a detailed point wise summary of a transcript."
+    },
+    {
+      "role": "user",
+      "content": "Identify and list in detail, the key points of the following transcript made by a clinician, in a nicely rendered markdown format: Based on your description of persistent headaches and occasional dizziness, you may be experiencing tension-type headaches, often linked to daily stressors or routines, particularly since they occur mostly in the afternoons and last for a couple of hours. Your difficulty concentrating at work could be a direct result of these headaches, which is likely exacerbated by stress. The occasional nausea you're experiencing, while not severe, is also common with tension-type headaches. Notably, your trouble sleeping is significant, as poor sleep quality can contribute to the frequency and intensity of headaches. While your symptoms don't immediately suggest a serious underlying condition, a thorough examination is essential. Meanwhile, implementing stress management techniques and improving your sleep hygiene could help alleviate your symptoms."
+    },
+    {
+      "role": "assistant",
+      "content": "### Summary\n\n1. **Headache Type:** \n   - Likely tension-type headaches, indicated by persistent headaches and occasional dizziness.\n\n2. **Timing and Duration:** \n   - Headaches typically occur in afternoons, lasting several hours, suggesting a link to daily stressors.\n\n3. **Impact on Concentration:** \n   - Difficulty concentrating at work, possibly exacerbated by the headaches and stress.\n\n4. **Associated Symptoms:** \n   - Occasional nausea accompanies the headaches, a common feature in tension-type headaches.\n\n5. **Sleep Quality:** \n   - Poor sleep quality noted, which can contribute to the frequency and intensity of headaches.\n\n6. **Underlying Conditions:** \n   - Symptoms do not immediately suggest a serious medical condition.\n\n7. **Immediate Recommendations:** \n   - Advises managing stress and improving sleep hygiene to alleviate symptoms.\n\n8. **Need for Examination:** \n   - Recommends a thorough examination to rule out serious conditions and fully understand health concerns.\n"
+    },
+    {
+      "role": "user",
+      "content": "Similarly, summarize and provide a neutral, point wise summary of the following transcript of a clinician's observations, in markdown format: "
+    }
+  ]
+}

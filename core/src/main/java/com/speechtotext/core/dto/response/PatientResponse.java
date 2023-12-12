@@ -1,8 +1,8 @@
 package com.speechtotext.core.dto.response;
 
-import java.util.List;
-
 public class PatientResponse {
+
+    private String patientId;
 
     private String firstName;
 
@@ -10,7 +10,17 @@ public class PatientResponse {
 
     private PatientAttributeResponse attributes;
 
-    private TenantResponse tenant;
+    private String summary;
+
+    private String tenant;
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -36,11 +46,19 @@ public class PatientResponse {
         this.attributes = attributes;
     }
 
-    public TenantResponse getTenant() {
+    public String getTenant() {
         return tenant;
     }
 
-    public void setTenant(TenantResponse tenant) {
+    public void setTenant(String tenant) {
         this.tenant = tenant;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 }
