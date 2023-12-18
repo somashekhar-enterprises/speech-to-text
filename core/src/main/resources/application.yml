@@ -10,9 +10,9 @@ openai:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/pm
+    url: ${DB_URL}
     username: postgres
-    password:
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: create-drop

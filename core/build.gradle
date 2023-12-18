@@ -43,10 +43,6 @@ dependencies {
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
 }
 
-flyway {
-	url = 'jdbc:postgresql://localhost:5432/pm'
-	user = 'postgres'
-}
 
 tasks.named('test') {
 	useJUnitPlatform()
